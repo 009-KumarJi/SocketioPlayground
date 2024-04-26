@@ -1,0 +1,20 @@
+{
+  "name": "socket-learn",
+  "version": "1.0.0",
+  "description": "Here, I am learning websockets with the help of socket.io. basically learning basics of socket.io",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "dev": "set NODE_ENV=DEVELOPMENT && nodemon server.js",
+    "start": "set NODE_ENV=PRODUCTION && node server.js"
+  },
+  "author": "Krishna Kumar",
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.0"
+  }
+}
