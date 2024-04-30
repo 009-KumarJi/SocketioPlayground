@@ -1,4 +1,4 @@
-# SocketPlayground
+# SocketIOPlayground
 
 Welcome to SocketPlayground, a learning repository dedicated to exploring the fundamentals of Socket.IO!
 
