@@ -1,17 +1,10 @@
-import {
-  Container,
-  Typography,
-  Paper,
-  TextField,
-  Button,
-  Stack,
-} from "@mui/material";
-import React, { useEffect, useMemo, useState } from "react";
-import { io } from "socket.io-client";
+import {Button, Container, Paper, Stack, TextField, Typography,} from "@mui/material";
+import {useEffect, useMemo, useState} from "react";
+import {io} from "socket.io-client";
 
 const App = () => {
   // useMemo is used to create a socket connection and memoize it to prevent re-creation on every render
-  const socket = useMemo(() => io("http://localhost:3000", { withCredentials: true }), []);
+  const socket = useMemo(() => io("http://localhost:3000", {withCredentials: true}), []);
 
   // useState is a Hook that allows you to add React state to function components
   // Here we're creating state variables for message, room and socketId
@@ -60,8 +53,8 @@ const App = () => {
       setSocketId(socket.id);
     });
 
-    // When a "recieve-message" event is received from the server, add the message to the messages state
-    socket.on("recieve-message", ({message, sid}) => {
+    // When a "receive-message" event is received from the server, add the message to the messages state
+    socket.on("receive-message", ({message, sid}) => {
       message.length && setMessages((messages) => [...messages, `${sid}: ${message}`]);
     });
 
@@ -69,153 +62,127 @@ const App = () => {
     return () => {
       socket.disconnect();
     };
-  }, []); // Empty dependency array means this effect runs once on mount and clean up on unmount
+  }); // Empty dependency array means this effect runs once on mount and clean up on unmount
 
-  // The component returns a JSX element that renders the web interface
+
+  const renderTypography = (variant, sx, text) => (
+    <Typography variant={variant} sx={sx}>
+      {text}
+    </Typography>
+  );
+
+  const renderTextField = (id, label, sx, value, onChange) => (
+    <TextField
+      id={id}
+      label={label}
+      variant="outlined"
+      sx={sx}
+      value={value}
+      onChange={onChange}
+    />
+  );
+
+  const renderButton = (type, variant, color, sx, text) => (
+    <Button type={type} variant={variant} color={color} sx={sx}>
+      {text}
+    </Button>
+  );
+
+  const renderForm = (onSubmit, children) => (
+    <form onSubmit={onSubmit}>
+      <Stack
+        direction={{xs: "column", sm: "row"}}
+        spacing={2}
+        sx={{
+          alignItems: "center",
+          justifyContent: "center",
+          width: "100%",
+        }}
+      >
+        {children}
+      </Stack>
+    </form>
+  );
+
+  const renderPaper = (sx, children) => (
+    <Paper sx={sx}>
+      {children}
+    </Paper>
+  );
+
   return (
-    <Container
-      style={{
-        display: "flex",
-        flexDirection: "column",
-        alignItems: "center",
-        justifyContent: "center",
+    <Container>
+      {renderTypography("h2", {
+        fontWeight: "bold",
+        marginBottom: {xs: "4rem", sm: "6rem"},
+        textAlign: "center"
+      }, "Welcome to Socket.IO!")}
+    <Stack
+      direction="column"
+      alignItems="center"
+      justifyContent="center"
+      sx={{
         height: "100vh",
-        backgroundColor: "#f5f5f5",
-        width: "100vw",
-        overflow: 'auto',
+        backgroundColor: "rgba(100, 30, 25, 0.1)",
+        padding: "2rem",
       }}
     >
-      <Typography
-  variant="h2"
-  sx={{
-    fontWeight: "bold",
-    marginBottom: { xs: "2rem", sm: "6rem" }, 
-    textAlign: "center", 
-  }}
->
-  Welcome to Socket.IO!
-</Typography>
 
-      <Typography variant="h5" sx={{ marginBottom: "2rem" }}>
-        Socket: {socketId}
-      </Typography>
-      {/* JOIN room */}
-      <Paper
-        sx={{
-          padding: "2rem",
-          height: { xs: "auto", sm: "25vh" }, 
-          width: { xs: "90%", sm: "50vw" }, 
-          display: "flex",
-          alignItems: "center",
-          minHeight: "250px",
-          justifyContent: "center",
-        }}
-      >
-        <form onSubmit={joinRoomHandler}>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            sx={{
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-            }}
-          >
-            <TextField
-              id="outlined-basic"
-              label="Room Name"
-              variant="outlined"
-              sx={{
-                marginBottom: "1rem",
-                marginRight: "1rem",
-                height: "50px",
-              }}
-              value={roomName}
-              onChange={(e) => setRoomName(e.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              sx={{
-                marginBottom: "1rem",
-                marginRight: "1rem",
-                justifySelf: "center",
-                height: "50px",
-              }}
-            >
-              Join Room
-            </Button>
-          </Stack>
-        </form>
-      </Paper>
+      {renderTypography("h5", {marginBottom: "2rem"}, `Socket: ${socketId}`)}
 
-      <Paper
-        sx={{
-          padding: "2rem",
-          height: { xs: "auto", sm: "25vh" }, // auto height for small screens
-          width: { xs: "90%", sm: "50vw" }, // 90% width for small screens
-          display: "flex", 
-          alignItems: "center",
-          minHeight: "250px",
-          justifyContent: "center",
-        }}
-      >
-        <form onClick={submitHandler}>
-          <Stack
-            direction={{ xs: "column", sm: "row" }}
-            spacing={2}
-            sx={{
-              alignItems: "center",
-              justifyContent: "center",
-              width: "100%",
-            }}
-          >
-            <TextField
-              id="outlined-basic"
-              label="Message"
-              variant="outlined"
-              sx={{
-                marginBottom: "1rem",
-                marginRight: "1rem",
-                height: "50px",
-              }}
-              value={message}
-              onChange={(e) => setMessage(e.target.value)}
-            />
-            <TextField
-              id="outlined-basic"
-              label="Room"
-              variant="outlined"
-              sx={{
-                marginBottom: "1rem",
-                marginRight: "1rem",
-                height: "50px",
-              }}
-              value={room}
-              onChange={(e) => setRoom(e.target.value)}
-            />
-            <Button
-              type="submit"
-              variant="contained"
-              color="primary"
-              sx={{
-                marginBottom: "1rem",
-                marginRight: "1rem",
-                justifySelf: "center",
-                height: "50px",
-              }}
-            >
-              Send
-            </Button>
-          </Stack>
-        </form>
-      </Paper>
-      <Paper
-      sx={{
+      {renderPaper({
         padding: "2rem",
-        height: { xs: "auto", sm: "25vh" }, // auto height for small screens
-        width: { xs: "90%", sm: "50vw" }, // 90% width for small screens
+        height: {xs: "auto", sm: "25vh"},
+        width: {xs: "90%", sm: "50vw"},
+        display: "flex",
+        alignItems: "center",
+        minHeight: "250px",
+        justifyContent: "center",
+      }, renderForm(joinRoomHandler, [
+        renderTextField("outlined-basic", "Room Name", {
+          marginBottom: "1rem",
+          marginRight: "1rem",
+          height: "50px"
+        }, roomName, (e) => setRoomName(e.target.value)),
+        renderButton("submit", "contained", "primary", {
+          marginBottom: "1rem",
+          marginRight: "1rem",
+          justifySelf: "center",
+          height: "50px"
+        }, "Join Room")
+      ]))}
+
+      {renderPaper({
+        padding: "2rem",
+        height: {xs: "auto", sm: "25vh"},
+        width: {xs: "90%", sm: "50vw"},
+        display: "flex",
+        alignItems: "center",
+        minHeight: "250px",
+        justifyContent: "center",
+      }, renderForm(submitHandler, [
+        renderTextField("outlined-basic", "Message", {
+          marginBottom: "1rem",
+          marginRight: "1rem",
+          height: "50px"
+        }, message, (e) => setMessage(e.target.value)),
+        renderTextField("outlined-basic", "Room", {
+          marginBottom: "1rem",
+          marginRight: "1rem",
+          height: "50px"
+        }, room, (e) => setRoom(e.target.value)),
+        renderButton("submit", "contained", "primary", {
+          marginBottom: "1rem",
+          marginRight: "1rem",
+          justifySelf: "center",
+          height: "50px"
+        }, "Send")
+      ]))}
+
+      {renderPaper({
+        padding: "2rem",
+        height: {xs: "auto", sm: "25vh"},
+        width: {xs: "90%", sm: "50vw"},
         display: "flex",
         flexDirection: "column",
         alignItems: "center",
@@ -224,19 +191,11 @@ const App = () => {
         backgroundColor: "rgba(100, 30, 25, 0.5)",
         color: "white",
         marginTop: "2rem",
-      }}
-      >
-        <Stack
-          sx={{
-            width: "100%",
-            overflow: "auto",
-          }}
-        >
-          {messages.map((msg, index) => (
-            <Typography key={index}>{msg}</Typography>
-          ))}
-        </Stack>
-      </Paper>
+      }, <Stack sx={{
+        width: "100%",
+        overflow: "auto"
+      }}>{messages.map((msg) => renderTypography(null, null, msg))}</Stack>)}
+    </Stack>
     </Container>
   );
 };

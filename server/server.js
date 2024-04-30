@@ -86,7 +86,7 @@ io.on("connection", (socket) => {
   socket.on("message", ({ room, message, socketId }) => {
     console.log({ room, message, socketId });
     // Emit the message to all clients in the room
-    socket.to(room).emit("recieve-message", { message, sid: socketId });
+    socket.to(room).emit("receive-message", { message, sid: socketId });
   });
 
   // Define what happens when a "join-room" event is received
