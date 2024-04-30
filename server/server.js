@@ -33,9 +33,10 @@ app.get("/", (req, res) => {
 
 io.on("connection", (socket) => {
   console.log(`Socket with ID '${socket.id}' connected!`);
-  socket.on("message", (data) => {
+
+  socket.on("message", (data) => { // listen for message event from client  
     console.log(data);
-    // io.emit("message", data);
+    socket.to(data.room).emit("recieve-message", data.message); // emit the message to all clients
   })
 
 
@@ -44,6 +45,6 @@ io.on("connection", (socket) => {
   })
 });
 
-server.listen(PORT, () => {
+server.listen(PORT, () => { // start the server
   console.log(`Server is running on port ${PORT} in ${mode} mode.`);
 });
